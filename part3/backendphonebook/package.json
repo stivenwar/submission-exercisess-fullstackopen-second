@@ -1,0 +1,22 @@
+{
+  "name": "part3",
+  "version": "1.0.0",
+  "description": "part 3 to fullstackopen",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js",
+    "test": "test.js"
+  },
+  "keywords": [
+    "rest"
+  ],
+  "author": "Esteban Guerra Olalla",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^5.1.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.10"
+  }
+}
