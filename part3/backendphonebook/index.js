@@ -7,7 +7,7 @@ morgan.token('body', (req) => {
   return req.method === 'POST' ? JSON.stringify(req.body) : '';
 });
 
-app.use(morgan(':method :url :status :res[content-length] - :response-time ms :body'));
+// app.use(morgan(':method :url :status :res[content-length] - :response-time ms :body'));
 
 const unknownEndpoint = (request, response, next) => {
   response.status(404).send({ error: 'unknown endpoint' })
@@ -68,10 +68,10 @@ app.delete('/api/persons/:id', (request, response) => {
   const newPersons = persons.filter(person => person.id !== id)
 
   persons.length = 0
-  console.log(persons);
+  // console.log(persons);
   
   persons.push(...newPersons)
-    console.log(persons);
+    // console.log(persons);
 
   response.status(200).json({response:"persona eliminada correctamente", agenda: persons})
 })
@@ -83,7 +83,7 @@ app.post('/api/persons', (request, response) => {
      return response.status(404).json({error:"name or number empty"})
     }
     const contact = persons.find(person => person.name === name)
-    console.log(contact);
+    // console.log(contact);
     
     if (contact) {
       return response.status(404).json({error:"name must be unique"})
@@ -94,7 +94,7 @@ app.post('/api/persons', (request, response) => {
     persons.push(
      personAdd
     )
-    console.log(persons);
+    // console.log(persons);
     
     
 
@@ -112,7 +112,8 @@ app.get('/info', (request, response) => {
 app.use(unknownEndpoint)
 
 
-const PORT = 3001
+const PORT = process.env.PORT || 3001
+
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`)
 })
