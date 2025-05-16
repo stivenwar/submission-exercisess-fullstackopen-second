@@ -7,6 +7,8 @@ app.use(express.json())
 var whitelist = ['https://submission-exercisess-fullstackopen.onrender.com/', 'http://localhost:5173/']
 var corsOptions = {
   origin: function (origin, callback) {
+    console.log(origin);
+    
     if (whitelist.indexOf(origin) !== -1) {
       callback(null, true)
     } else {
