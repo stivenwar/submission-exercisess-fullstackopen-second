@@ -1,7 +1,21 @@
 const express = require('express')
 const morgan = require('morgan')
+const cors =require('cors')
 const app = express()
 app.use(express.json())
+
+var whitelist = ['https://submission-exercisess-fullstackopen.onrender.com/', 'http://localhost:5173/']
+var corsOptions = {
+  origin: function (origin, callback) {
+    if (whitelist.indexOf(origin) !== -1) {
+      callback(null, true)
+    } else {
+      callback(new Error('Not allowed by CORS'))
+    }
+  }
+}
+
+app.use(cors(corsOptions))
 
 morgan.token('body', (req) => {
   return req.method === 'POST' ? JSON.stringify(req.body) : '';
