@@ -4,12 +4,12 @@ const cors =require('cors')
 const app = express()
 app.use(express.json())
 
-var whitelist = ['https://submission-exercisess-fullstackopen.onrender.com/', 'http://localhost:5173/']
+var whitelist = ['https://submission-exercisess-fullstackopen.onrender.com', 'http://localhost:5173']
 var corsOptions = {
   origin: function (origin, callback) {
-    console.log(origin);
+      console.log('Origin:', origin);
     
-    if (whitelist.indexOf(origin) !== -1) {
+    if (!origin || whitelist.indexOf(origin) !== -1) {
       callback(null, true)
     } else {
       callback(new Error('Not allowed by CORS'))
