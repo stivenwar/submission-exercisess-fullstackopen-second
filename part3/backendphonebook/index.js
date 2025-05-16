@@ -3,7 +3,6 @@ const morgan = require('morgan')
 const cors =require('cors')
 const app = express()
 const path = require('path');
-
 app.use(express.json())
 // Servir archivos estáticos desde la carpeta 'dist'
 app.use(express.static(path.join(__dirname, 'dist')));
