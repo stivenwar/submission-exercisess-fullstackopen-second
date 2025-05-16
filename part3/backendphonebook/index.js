@@ -2,8 +2,11 @@ const express = require('express')
 const morgan = require('morgan')
 const cors =require('cors')
 const app = express()
+const path = require('path');
+
 app.use(express.json())
-app.use(express.static('dist'))
+// Servir archivos estáticos desde la carpeta 'dist'
+app.use(express.static(path.join(__dirname, 'dist')));
 
 var whitelist = ['https://submission-exercisess-fullstackopen.onrender.com', 'http://localhost:5173']
 var corsOptions = {
@@ -54,8 +57,8 @@ const persons = [    {
     }]
 
 app.get('/', (request, response) => {
-
-    response.json(persons)
+    res.sendFile(path.join(__dirname, 'dist', 'index.html'));
+    // response.json(persons)
 })
 
 app.get('/api/persons', (request, response) => {
