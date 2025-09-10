@@ -124,7 +124,8 @@ app.post('/api/persons', (request, response) => {
 })
 app.get('/info', (request, response) => {
     const date = new Date()
-    response.send("<p>Phonebook has info for 2 people</p>"+date)
+    const countPerson = persons.length
+    response.send(`<p>Phonebook has info for ${countPerson} people</p>${date}`)
   
 })
 
