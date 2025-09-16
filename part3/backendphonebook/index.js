@@ -42,8 +42,10 @@ const errorHandler = (error, request, response, next) => {
   console.error(error.message)
 
   if (error.name === 'CastError') {
-    return response.status(400).send({ error: 'malformatted id' })
-  } 
+     response.status(400).send({ error: 'malformatted id' })
+  } else if (error.name === 'ValidationError') {
+     response.status(400).json({ error: error.message })
+  }
 
   next(error)
 }
@@ -126,7 +128,7 @@ app.put('/api/persons/:id',(request, response , next)=>{
 
   const {name,number,id} = request.body
 
-   Person.findByIdAndUpdate( id,{name:name,number:number}, {new:true}).then(person => {
+   Person.findByIdAndUpdate( id,{name:name,number:number}, {new:true,runValidators:true,context: 'query'}).then(person => {
     console.log("person update "+person);
     
       if (person) {
@@ -141,7 +143,7 @@ app.put('/api/persons/:id',(request, response , next)=>{
 
 })
 
-app.post('/api/persons', (request, response) => {
+app.post('/api/persons', (request, response, next) => {
   const {name,number} = request.body
    console.log(name,number);
   
@@ -167,11 +169,12 @@ app.post('/api/persons', (request, response) => {
  const newPerson = new Person({ name, number });
 
     return newPerson.save().then(savedPerson => {
-      response.status(201).json(savedPerson);
-    }).catch(error => {
-      console.log(error);
+      console.log("save");
       
-    });
+      console.log(savedPerson);
+      
+      response.status(201).json(savedPerson);
+    }).catch(error=> next(error))
 
     /*let counter = persons.length>0?Math.max(...persons.map(person=>person.id)):0
     const personAdd =  {id: Number(counter+1),name:name, number: number}
