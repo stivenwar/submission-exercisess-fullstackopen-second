@@ -11,7 +11,7 @@ app.use(express.json())
 // Servir archivos estáticos desde la carpeta 'dist'
 app.use(express.static(path.join(__dirname, 'dist')));
 
-var whitelist = ['https://submission-exercisess-fullstackopen.onrender.com', 'http://localhost:3001']
+var whitelist = ['https://submission-exercisess-fullstackopen.onrender.com', 'http://localhost:3001','http://localhost:5173']
 var corsOptions = {
   origin: function (origin, callback) {
       // console.log('Origin:', origin);
@@ -33,9 +33,22 @@ morgan.token('body', (req) => {
 // app.use(morgan(':method :url :status :res[content-length] - :response-time ms :body'));
 
 const unknownEndpoint = (request, response, next) => {
+
   response.status(404).send({ error: 'unknown endpoint' })
   next()
 }
+
+const errorHandler = (error, request, response, next) => {
+  console.error(error.message)
+
+  if (error.name === 'CastError') {
+    return response.status(400).send({ error: 'malformatted id' })
+  } 
+
+  next(error)
+}
+
+
 
 
 const persons = [    { 
@@ -60,7 +73,7 @@ const persons = [    {
     }]
 
 app.get('/', (request, response) => {
-    res.sendFile(path.join(__dirname, 'dist', 'index.html'));
+    //response.sendFile(path.join(__dirname, 'dist', 'index.html'));
     // response.json(persons)
 })
 
@@ -69,14 +82,15 @@ app.get('/api/persons', (request, response) => {
      Person.find({}).then(result => {
         console.log(result);
   
-        response.status(200).send(result)
-
-
+        response.status(200).json(result)
+     }).catch(error => {
+      console.log(error);
+      
      })
 
 })
 
-app.get('/api/persons/:id', (request, response) => {
+app.get('/api/persons/:id', (request, response, next) => {
   
   const id = request.params.id
   Person.findById({_id:id}).then(person =>  {
@@ -87,52 +101,43 @@ app.get('/api/persons/:id', (request, response) => {
       response.status(404).end();
     }
     
-  }).catch(error => {
-    console.log(error);
-    
-      return response.status(404).json({error:"no se ha encontrado nigun titular con ese identificador"})
-  })
+  }).catch(error =>  next(error))
 
   
 
 })
 
-app.delete('/api/persons/:id', (request, response) => {
+app.delete('/api/persons/:id', (request, response,next) => {
   
   const id = request.params.id
   
   Person.deleteOne({_id: id}).then(person => {
       console.log(person);
       if (person) {
-        response.status(200).json({response:"persona eliminada correctamente", agenda: person})
+        response.status(200).json({response:"persona eliminada correctamente"})
       }else {
         response.status(404).end();
       }
 
-  }).catch(error => {
-    console.log(error);
-      response.status(500).json({message: "ha ocurrido un error",});
-  })
+  }).catch(error =>  next(error))
       
 })
-app.put('/api/persons/:id',(request, response)=>{
+app.put('/api/persons/:id',(request, response , next)=>{
 
   const {name,number,id} = request.body
 
-   Person.updateOne({_id: id},{name:name,number:number}).then(person => {
+   Person.findByIdAndUpdate( id,{name:name,number:number}, {new:true}).then(person => {
+    console.log("person update "+person);
     
       if (person) {
-             response.status(201).json({message: "persona cambiada correctamente",});
+             response.status(201).json(person);
       }else {
         response.status(404).end();
       }
 
 
    
-  }).catch(error => {
-    console.log(error);
-      response.status(500).json({message: "ha ocurrido un error",});
-  })
+  }).catch(error =>  next(error))
 
 })
 
@@ -162,10 +167,10 @@ app.post('/api/persons', (request, response) => {
  const newPerson = new Person({ name, number });
 
     return newPerson.save().then(savedPerson => {
-      response.status(201).json({
-        message: "persona añadida correctamente",
-        savedPerson,
-      });
+      response.status(201).json(savedPerson);
+    }).catch(error => {
+      console.log(error);
+      
     });
 
     /*let counter = persons.length>0?Math.max(...persons.map(person=>person.id)):0
@@ -182,13 +187,16 @@ app.post('/api/persons', (request, response) => {
 })
 app.get('/info', (request, response) => {
     const date = new Date()
-    const countPerson = persons.length
-    response.send(`<p>Phonebook has info for ${countPerson} people</p>${date}`)
+   Person.countDocuments({}).then(res => {
+    console.log(res);
+       response.send(`<p>Phonebook has info for ${res} people</p>${date}`)
+   })
+ 
   
 })
 
-
-
+// este debe ser el último middleware cargado, ¡también todas las rutas deben ser registrada antes que esto!
+app.use(errorHandler)
 app.use(unknownEndpoint)
 
 
