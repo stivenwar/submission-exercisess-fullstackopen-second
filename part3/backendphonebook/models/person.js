@@ -6,16 +6,14 @@ const url = process.env.MONGO_URI;
 console.log("conecting to uri");
 
 mongoose.connect(url)
-.then(result => {
+.then(() => {
     console.log("connected to MongoDB");
-    
 }).catch(error => {
     console.log("error conecting to MOngoDB", error.message);
-    
 })
 
 const personSchema = new mongoose.Schema({
-    name: { type: String, required: true , minLenght: 3},
+    name: { type: String, required: true , minLenght: 3 },
     number: {
         type: String,
         required: true,

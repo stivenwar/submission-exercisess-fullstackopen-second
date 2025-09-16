@@ -15,7 +15,7 @@ var whitelist = ['https://submission-exercisess-fullstackopen.onrender.com', 'ht
 var corsOptions = {
   origin: function (origin, callback) {
       // console.log('Origin:', origin);
-    
+
     if (!origin || whitelist.indexOf(origin) !== -1) {
       callback(null, true)
     } else {
@@ -51,29 +51,6 @@ const errorHandler = (error, request, response, next) => {
 }
 
 
-
-
-const persons = [    { 
-      "id": 1,
-      "name": "Arto Hellas", 
-      "number": "040-123456"
-    },
-    { 
-      "id": 2,
-      "name": "Ada Lovelace", 
-      "number": "39-44-5323523"
-    },
-    { 
-      "id": 3,
-      "name": "Dan Abramov", 
-      "number": "12-43-234345"
-    },
-    { 
-      "id": 4,
-      "name": "Mary Poppendieck", 
-      "number": "39-23-6423122"
-    }]
-
 app.get('/', (request, response) => {
     //response.sendFile(path.join(__dirname, 'dist', 'index.html'));
     // response.json(persons)
@@ -83,54 +60,54 @@ app.get('/api/persons', (request, response) => {
 
      Person.find({}).then(result => {
         console.log(result);
-  
+
         response.status(200).json(result)
      }).catch(error => {
       console.log(error);
-      
+
      })
 
 })
 
 app.get('/api/persons/:id', (request, response, next) => {
-  
+
   const id = request.params.id
-  Person.findById({_id:id}).then(person =>  {
+  Person.findById({ _id:id }).then(person =>  {
 
     if(person){
       response.status(200).json(person)
     }else{
       response.status(404).end();
     }
-    
+
   }).catch(error =>  next(error))
 
-  
+
 
 })
 
 app.delete('/api/persons/:id', (request, response,next) => {
-  
+
   const id = request.params.id
-  
-  Person.deleteOne({_id: id}).then(person => {
+
+  Person.deleteOne({ _id: id }).then(person => {
       console.log(person);
       if (person) {
-        response.status(200).json({response:"persona eliminada correctamente"})
+        response.status(200).json({ response:"persona eliminada correctamente" })
       }else {
         response.status(404).end();
       }
 
   }).catch(error =>  next(error))
-      
+
 })
-app.put('/api/persons/:id',(request, response , next)=>{
+app.put('/api/persons/:id',(request, response , next) => {
 
-  const {name,number,id} = request.body
+  const { name,number,id } = request.body
 
-   Person.findByIdAndUpdate( id,{name:name,number:number}, {new:true,runValidators:true,context: 'query'}).then(person => {
+   Person.findByIdAndUpdate( id,{ name:name,number:number }, { new:true,runValidators:true,context: 'query' }).then(person => {
     console.log("person update "+person);
-    
+
       if (person) {
              response.status(201).json(person);
       }else {
@@ -138,18 +115,18 @@ app.put('/api/persons/:id',(request, response , next)=>{
       }
 
 
-   
+
   }).catch(error =>  next(error))
 
 })
 
 app.post('/api/persons', (request, response, next) => {
-  const {name,number} = request.body
+  const { name,number } = request.body
    console.log(name,number);
-  
+
 
     if (!name || !number ) {
-     return response.status(404).json({error:"name or number empty"})
+     return response.status(404).json({ error:"name or number empty" })
     }
     //const contact = persons.find(person => person.name === name)
     // console.log(contact);
@@ -157,24 +134,21 @@ app.post('/api/persons', (request, response, next) => {
     /*Person.findOne({name: name})
   .then(contact => {
     console.log(contact);
-    
+
     if (contact) {
       // ⚠️ IMPORTANTE: return aquí para cortar la ejecución
       return response.status(400).json({ error: "name must be unique" });
     }
 
-   
   })
   .catch(error => next(error));*/
  const newPerson = new Person({ name, number });
 
     return newPerson.save().then(savedPerson => {
       console.log("save");
-      
       console.log(savedPerson);
-      
       response.status(201).json(savedPerson);
-    }).catch(error=> next(error))
+    }).catch( error => next(error) )
 
     /*let counter = persons.length>0?Math.max(...persons.map(person=>person.id)):0
     const personAdd =  {id: Number(counter+1),name:name, number: number}
@@ -182,11 +156,7 @@ app.post('/api/persons', (request, response, next) => {
      personAdd
     )
     // console.log(persons);*/
-    
-    
-
      //response.status(200).json({response:"personas anyadidas correctamente", personAdd})
-  
 })
 app.get('/info', (request, response) => {
     const date = new Date()
@@ -194,8 +164,8 @@ app.get('/info', (request, response) => {
     console.log(res);
        response.send(`<p>Phonebook has info for ${res} people</p>${date}`)
    })
- 
-  
+
+
 })
 
 // este debe ser el último middleware cargado, ¡también todas las rutas deben ser registrada antes que esto!

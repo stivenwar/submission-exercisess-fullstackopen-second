@@ -3,10 +3,12 @@ const mongoose = require('mongoose');
 
 if(process.argv.length < 3){
     console.log("give me a password to start")
-    process.exit(1)   
+    process.exit(1)
 }
 
 const password = process.argv[2];
+console.log(password);
+
 
 
 
@@ -15,7 +17,7 @@ const number = process.argv[4];
 
 
 
-const url = `mongodb+srv://stivenwar:${password}@cluster0.byec2uo.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
+const url = process.env.MONGO_URI;;
 
 mongoose.set("strictQuery",false)
 mongoose.connect(url)
@@ -37,10 +39,9 @@ if(!name && !number){
     console.log("phonebook:");
     result.forEach(person => {
         console.log(`${person.name} ${person.number}`);
-    
     })
     mongoose.connection.close();
-    process.exit(1)   
+    process.exit(1)
 })
 }
 
@@ -48,7 +49,6 @@ if(name && number){
     person.save().then(result => {
     console.log(`added ${result} to phonebook`);
     mongoose.connection.close();
-    
     })
 }
 
